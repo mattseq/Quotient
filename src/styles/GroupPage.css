@@ -1,0 +1,85 @@
+/* Styles for GroupPage and AddQuote */
+.group-page-container {
+  background: var(--color-bg);
+  min-height: 100vh;
+  color: var(--color-text-primary);
+  padding: 2rem;
+}
+.group-page-title {
+  color: var(--color-text-accent);
+}
+.group-page-btn {
+  background: var(--color-accent);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+.add-quote-container {
+  margin-bottom: 2rem;
+}
+.add-quote-form {
+  background: var(--color-surface);
+  padding: 1rem;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+}
+.add-quote-title {
+  color: var(--color-text-accent);
+}
+.add-quote-input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+.add-quote-btn {
+  background: var(--color-accent);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.add-quote-cancel {
+  margin-left: 1rem;
+  background: var(--color-border);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.add-quote-error {
+  color: red;
+  margin-top: 1rem;
+}
+.group-page-quotes-list {
+  list-style: none;
+  padding: 0;
+}
+.group-page-quote-item {
+  background: var(--color-surface);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-border);
+}
+.group-page-quote-author {
+  color: var(--color-text-secondary);
+  margin-left: 1rem;
+}
+.group-page-empty {
+  color: var(--color-text-secondary);
+}
+.group-page-leaderboard-title {
+  color: var(--color-text-accent);
+}
+.group-page-leaderboard-placeholder {
+  color: var(--color-text-secondary);
+}

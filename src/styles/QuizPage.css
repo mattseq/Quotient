@@ -1,0 +1,44 @@
+/* Styles for QuizPage */
+.quiz-page-container {
+  background: var(--color-bg);
+  min-height: 100vh;
+  color: var(--color-text-primary);
+  padding: 2rem;
+}
+.quiz-page-title {
+  color: var(--color-text-accent);
+}
+.quiz-page-question {
+  margin-bottom: 1rem;
+  background: var(--color-surface);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.quiz-page-input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+.quiz-page-btn {
+  background: var(--color-accent);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.quiz-page-score {
+  margin-top: 2rem;
+  color: var(--color-text-accent);
+  font-weight: bold;
+}
+.quiz-page-empty {
+  color: var(--color-text-secondary);
+}

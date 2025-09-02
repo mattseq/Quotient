@@ -1,0 +1,47 @@
+/* Styles for CreateGroup component */
+.create-group-container {
+  margin-bottom: 2rem;
+}
+.create-group-form {
+  background: var(--color-surface);
+  padding: 1rem;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+}
+.create-group-title {
+  color: var(--color-text-accent);
+}
+.create-group-input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+.create-group-btn {
+  background: var(--color-accent);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-accent-light);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.create-group-btn:hover {
+  background: var(--color-accent-light);
+  box-shadow: 0 0 10px var(--color-accent-light);
+}
+.create-group-cancel {
+  margin-left: 1rem;
+  background: var(--color-border);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.create-group-error {
+  color: red;
+  margin-top: 1rem;
+}
