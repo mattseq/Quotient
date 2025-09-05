@@ -37,7 +37,7 @@ function AddQuote({ groupId, onQuoteAdded }) {
 
   return (
     <div className="add-quote-container">
-      <button className="add-quote-btn" onClick={() => setShowForm(true)}>
+      <button className="group-page-btn" onClick={() => setShowForm(true)}>
         Add Quote
       </button>
       {showForm && (
@@ -65,7 +65,7 @@ function AddQuote({ groupId, onQuoteAdded }) {
                 className="add-quote-input"
               />
               <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-                <button type="submit" disabled={loading} className="add-quote-btn">
+                <button type="submit" disabled={loading} className="group-page-btn">
                   {loading ? 'Adding...' : 'Add Quote'}
                 </button>
                 <button type="button" className="add-quote-cancel" onClick={() => setShowForm(false)}>Cancel</button>
@@ -83,6 +83,11 @@ function GroupPage({ groupId }) {
   const [quotes, setQuotes] = useState([]);
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editingQuoteId, setEditingQuoteId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [editAuthor, setEditAuthor] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
 
   const fetchGroupAndQuotes = async () => {
     try {
@@ -108,30 +113,98 @@ function GroupPage({ groupId }) {
   if (loading) return <div className="group-page-container">Loading...</div>;
   if (!group) return <div className="group-page-empty">Group not found.</div>;
 
+  // Edit quote handler
+  const handleEditClick = (quote) => {
+    setEditingQuoteId(quote.$id);
+    setEditText(quote.text);
+    setEditAuthor(quote.author);
+    setEditError('');
+  };
+
+  const handleEditCancel = () => {
+    setEditingQuoteId(null);
+    setEditText('');
+    setEditAuthor('');
+    setEditError('');
+  };
+
+  const handleEditSave = async () => {
+    setEditLoading(true);
+    setEditError('');
+    try {
+      await databases.updateDocument("main", "quotes", editingQuoteId, {
+        text: editText,
+        author: editAuthor
+      });
+      setEditingQuoteId(null);
+      setEditText('');
+      setEditAuthor('');
+      await fetchGroupAndQuotes();
+    } catch (err) {
+      setEditError(err.message);
+    }
+    setEditLoading(false);
+  };
+
   return (
     <div className="group-page-container">
       <h2 className="group-page-title">{group.name}</h2>
-      <div className="group-page-quotes-section">
+      <div className="group-page-top-buttons">
+        <button className="group-page-btn" onClick={() => window.location.href = `/quiz/${groupId}`}>Quiz</button>
+        <button className="group-page-btn" style={{ marginLeft: '1rem' }}>Leaderboard</button>
+      </div>
+      <div className="group-page-quotes-header">
         <h3 className="group-page-title">Quotes</h3>
+        <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
+      </div>
+      <div className="group-page-divider" />
+      <div className="group-page-quotes-section" style={{ flexGrow: 1 }}>
         <ul className="group-page-quotes-list">
           {quotes.length === 0 ? (
             <li className="group-page-empty">No quotes in this group.</li>
           ) : (
             quotes.map(q => (
               <li key={q.$id} className="group-page-quote-item">
-                <span>{q.text}</span>
-                <span className="group-page-quote-author">— {q.author}</span>
+                {editingQuoteId === q.$id ? (
+                  // Edit form replaces quote content, not nested
+                  <>
+                    <textarea
+                      className="edit-quote-input"
+                      value={editText}
+                      onChange={e => setEditText(e.target.value)}
+                      rows={3}
+                    />
+                    <input
+                      className="edit-quote-input"
+                      type="text"
+                      value={editAuthor}
+                      onChange={e => setEditAuthor(e.target.value)}
+                    />
+                    <div>
+                      <button onClick={handleEditSave} disabled={editLoading} className="group-page-btn" style={{ marginRight: '1rem' }}>
+                        {editLoading ? 'Saving...' : 'Save'}
+                      </button>
+                      <button onClick={handleEditCancel} className="group-page-btn">Cancel</button>
+                    </div>
+                    {editError && <div className="add-quote-error">{editError}</div>}
+                  </>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <span>{q.text}</span>
+                      <span className="group-page-quote-author">— {q.author}</span>
+                    </div>
+                    <button
+                      className="group-page-btn"
+                      onClick={() => handleEditClick(q)}
+                    >Edit</button>
+                  </div>
+                )}
               </li>
             ))
           )}
         </ul>
-        <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
       </div>
-      <div style={{ margin: '2rem 0 2rem 0' }}>
-        <button className="group-page-btn" onClick={() => window.location.href = `/quiz/${groupId}`}>Start Solo Quiz</button>
-      </div>
-  <h3 className="group-page-leaderboard-title">Leaderboard</h3>
-  <div className="group-page-leaderboard-placeholder">Coming soon!</div>
     </div>
   );
 }
