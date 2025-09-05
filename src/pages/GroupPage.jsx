@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { databases, account } from '../appwrite';
 import '../styles/GroupPage.css';
 
@@ -74,12 +73,10 @@ function AddQuote({ groupId, onQuoteAdded }) {
   );
 }
 
-function GroupPage() {
-  const { groupId } = useParams();
+function GroupPage({ groupId }) {
   const [quotes, setQuotes] = useState([]);
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   const fetchGroupAndQuotes = async () => {
     try {
@@ -108,7 +105,7 @@ function GroupPage() {
   return (
     <div className="group-page-container">
       <h2 className="group-page-title">{group.name}</h2>
-      <button className="group-page-btn" onClick={() => navigate(`/quiz/${groupId}`)}>Start Solo Quiz</button>
+      {/* Quiz button removed for now, can be added to main area if needed */}
       <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
       <h3 className="group-page-title">Quotes</h3>
       <ul className="group-page-quotes-list">

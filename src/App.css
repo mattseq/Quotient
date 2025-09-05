@@ -1,0 +1,18 @@
+
+/* App Layout */
+.app-layout {
+	display: flex;
+	height: 100vh;
+	background: var(--color-bg);
+	overflow: hidden;
+}
+
+
+/* Main Window Styles */
+.main-window {
+	flex: 1;
+	padding: 2rem;
+	background: var(--color-bg);
+	color: var(--color-text-primary);
+	overflow: hidden;
+}
