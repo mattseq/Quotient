@@ -20,6 +20,11 @@
   color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
+.create-group-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-light);
+}
 .create-group-btn {
   background: var(--color-accent);
   color: var(--color-text-primary);
@@ -44,4 +49,136 @@
 .create-group-error {
   color: red;
   margin-top: 1rem;
+}
+
+/* Modal styles for CreateGroup popup */
+.create-group-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.create-group-modal-content {
+  background: var(--color-surface);
+  padding: 2rem 2rem 2rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  min-width: 320px;
+  max-width: 480px;
+  width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+.create-group-modal-content,
+.create-group-modal-content * {
+  font-family: inherit !important;
+}
+.create-group-modal-content form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+.create-group-modal-content .create-group-input {
+  margin-bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  align-self: center;
+}
+.create-group-modal-content .create-group-btn,
+.create-group-modal-content .create-group-cancel {
+  margin-bottom: 0;
+}
+.create-group-title {
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.create-group-error {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+.create-group-user-search-wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+.create-group-user-results {
+  background: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin: 0;
+  padding: 0.5rem 0;
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  left: 0;
+  top: 100%;
+  box-sizing: border-box;
+  list-style: none;
+  border: 1px solid var(--color-border);
+  max-height: 180px;
+  overflow-y: auto;
+}
+.create-group-user-results li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  font-size: 1.05rem;
+  transition: background 0.18s;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.create-group-user-results li:last-child {
+  border-bottom: none;
+}
+.create-group-user-results li:hover {
+  color: var(--color-text-accent);
+}
+.create-group-selected-users {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.create-group-user-chip {
+  background: var(--color-accent-light);
+  color: var(--color-text-primary);
+  border-radius: 16px;
+  padding: 0.3rem 0.8rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.98rem;
+}
+.create-group-user-chip-remove {
+  margin-left: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.2rem;
+}
+.create-group-modal-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }

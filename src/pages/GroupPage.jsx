@@ -28,7 +28,7 @@ function AddQuote({ groupId, onQuoteAdded }) {
       setText('');
       setAuthor('');
       setShowForm(false);
-      if (onQuoteAdded) onQuoteAdded();
+      if (onGroupCreated) onGroupCreated();
     } catch (err) {
       setError(err.message);
     }
@@ -37,36 +37,42 @@ function AddQuote({ groupId, onQuoteAdded }) {
 
   return (
     <div className="add-quote-container">
-      {!showForm ? (
-        <button className="add-quote-btn" onClick={() => setShowForm(true)}>
-          Add Quote
-        </button>
-      ) : (
-        <div className="add-quote-form">
-          <h3 className="add-quote-title">Add a Quote</h3>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Quote text"
-              value={text}
-              onChange={e => setText(e.target.value)}
-              required
-              className="add-quote-input"
-            />
-            <input
-              type="text"
-              placeholder="Author"
-              value={author}
-              onChange={e => setAuthor(e.target.value)}
-              required
-              className="add-quote-input"
-            />
-            <button type="submit" disabled={loading} className="add-quote-btn">
-              {loading ? 'Adding...' : 'Add Quote'}
-            </button>
-            <button type="button" className="add-quote-cancel" onClick={() => setShowForm(false)}>Cancel</button>
-          </form>
-          {error && <div className="add-quote-error">{error}</div>}
+      <button className="add-quote-btn" onClick={() => setShowForm(true)}>
+        Add Quote
+      </button>
+      {showForm && (
+        <div className="add-quote-modal" onClick={e => {
+          if (e.target.classList.contains('add-quote-modal')) setShowForm(false);
+        }}>
+          <div className="add-quote-modal-content">
+            <h3 className="add-quote-title">Add a Quote</h3>
+            <form onSubmit={handleSubmit}>
+              <textarea
+                placeholder="Quote text"
+                value={text}
+                onChange={e => setText(e.target.value)}
+                required
+                className="add-quote-textarea"
+                rows={5}
+                style={{ width: '100%', resize: 'vertical', fontSize: '1.1rem', marginBottom: '1rem' }}
+              />
+              <input
+                type="text"
+                placeholder="Author"
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+                required
+                className="add-quote-input"
+              />
+              <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                <button type="submit" disabled={loading} className="add-quote-btn">
+                  {loading ? 'Adding...' : 'Add Quote'}
+                </button>
+                <button type="button" className="add-quote-cancel" onClick={() => setShowForm(false)}>Cancel</button>
+              </div>
+            </form>
+            {error && <div className="add-quote-error">{error}</div>}
+          </div>
         </div>
       )}
     </div>
@@ -105,24 +111,27 @@ function GroupPage({ groupId }) {
   return (
     <div className="group-page-container">
       <h2 className="group-page-title">{group.name}</h2>
-      {/* Quiz button removed for now, can be added to main area if needed */}
-      <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
-      <h3 className="group-page-title">Quotes</h3>
-      <ul className="group-page-quotes-list">
-        {quotes.length === 0 ? (
-          <li className="group-page-empty">No quotes in this group.</li>
-        ) : (
-          quotes.map(q => (
-            <li key={q.$id} className="group-page-quote-item">
-              <span>{q.text}</span>
-              <span className="group-page-quote-author">— {q.author}</span>
-            </li>
-          ))
-        )}
-      </ul>
-      {/* Leaderboard placeholder */}
-      <h3 className="group-page-leaderboard-title">Leaderboard</h3>
-      <div className="group-page-leaderboard-placeholder">Coming soon!</div>
+      <div className="group-page-quotes-section">
+        <h3 className="group-page-title">Quotes</h3>
+        <ul className="group-page-quotes-list">
+          {quotes.length === 0 ? (
+            <li className="group-page-empty">No quotes in this group.</li>
+          ) : (
+            quotes.map(q => (
+              <li key={q.$id} className="group-page-quote-item">
+                <span>{q.text}</span>
+                <span className="group-page-quote-author">— {q.author}</span>
+              </li>
+            ))
+          )}
+        </ul>
+        <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
+      </div>
+      <div style={{ margin: '2rem 0 2rem 0' }}>
+        <button className="group-page-btn" onClick={() => window.location.href = `/quiz/${groupId}`}>Start Solo Quiz</button>
+      </div>
+  <h3 className="group-page-leaderboard-title">Leaderboard</h3>
+  <div className="group-page-leaderboard-placeholder">Coming soon!</div>
     </div>
   );
 }
