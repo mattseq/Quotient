@@ -25,10 +25,10 @@ function AddQuote({ groupId, onQuoteAdded }) {
       const group = await databases.getDocument("main", "groups", groupId);
       const updatedBank = Array.isArray(group.quoteBank) ? [...group.quoteBank, quote.$id] : [quote.$id];
       await databases.updateDocument("main", "groups", groupId, { quoteBank: updatedBank });
-      setText('');
-      setAuthor('');
-      setShowForm(false);
-      if (onGroupCreated) onGroupCreated();
+  setText('');
+  setAuthor('');
+  setShowForm(false);
+  if (onQuoteAdded) onQuoteAdded();
     } catch (err) {
       setError(err.message);
     }
