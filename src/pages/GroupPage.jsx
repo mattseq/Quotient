@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { databases, account } from '../appwrite';
+import { databases, account, client } from '../appwrite';
+import { ID } from 'appwrite';
 import '../styles/GroupPage.css';
+import { FaEdit, FaTrash, FaTrophy, FaClipboardList, FaPlus } from 'react-icons/fa';
 
 function AddQuote({ groupId, onQuoteAdded }) {
   const [showForm, setShowForm] = useState(false);
@@ -36,10 +38,24 @@ function AddQuote({ groupId, onQuoteAdded }) {
   };
 
   return (
-    <div className="add-quote-container">
-      <button className="group-page-btn" onClick={() => setShowForm(true)}>
-        Add Quote
-      </button>
+    <>
+      <li
+        className="group-page-quote-item group-page-add-quote-item"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          fontWeight: 500,
+          gap: '0.7rem',
+          marginBottom: '1rem',
+          background: 'var(--color-bg)'
+        }}
+        onClick={() => setShowForm(true)}
+        title="Add Quote"
+      >
+        <FaPlus style={{ fontWeight: 'bold' }} />
+      </li>
       {showForm && (
         <div className="add-quote-modal" onClick={e => {
           if (e.target.classList.contains('add-quote-modal')) setShowForm(false);
@@ -75,7 +91,7 @@ function AddQuote({ groupId, onQuoteAdded }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -108,6 +124,28 @@ function GroupPage({ groupId }) {
 
   useEffect(() => {
     fetchGroupAndQuotes();
+
+    // Realtime subscription for quotes collection
+    const unsubscribe = client.subscribe(
+      [`databases.main.collections.quotes.documents`],
+      response => {
+        // Only refresh if the quote is relevant to this group
+        if (
+          response.payload &&
+          (
+            response.payload.groupId === groupId ||
+            (response.events.some(e => e.endsWith('.delete')) && quotes.some(q => q.$id === response.payload.$id))
+          )
+        ) {
+          fetchGroupAndQuotes();
+        }
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+    // eslint-disable-next-line
   }, [groupId]);
 
   if (loading) return <div className="group-page-container">Loading...</div>;
@@ -146,24 +184,52 @@ function GroupPage({ groupId }) {
     setEditLoading(false);
   };
 
+  const handleDeleteQuote = async (quoteId) => {
+    try {
+      // Remove quote from quotes collection
+      await databases.deleteDocument("main", "quotes", quoteId);
+      // Remove quote from group's quoteBank
+      const groupRes = await databases.getDocument("main", "groups", groupId);
+      const updatedBank = Array.isArray(groupRes.quoteBank)
+        ? groupRes.quoteBank.filter(id => id !== quoteId)
+        : [];
+      await databases.updateDocument("main", "groups", groupId, { quoteBank: updatedBank });
+      await fetchGroupAndQuotes();
+    } catch (err) {
+      // Optionally handle error (e.g. show a message)
+    }
+  };
+
   return (
     <div className="group-page-container">
-      <h2 className="group-page-title">{group.name}</h2>
-      <div className="group-page-top-buttons">
-        <button className="group-page-btn" onClick={() => window.location.href = `/quiz/${groupId}`}>Quiz</button>
-        <button className="group-page-btn" style={{ marginLeft: '1rem' }}>Leaderboard</button>
+      <div className="group-page-title-row">
+        <h2 className="group-page-title">{group.name}</h2>
+        <div className="group-page-title-actions">
+          <button
+            className="group-page-icon-btn quiz"
+            title="Quiz"
+            onClick={() => window.location.href = `/quiz/${groupId}`}
+          >
+            <FaClipboardList size={28} />
+          </button>
+          <button
+            className="group-page-icon-btn"
+            title="Leaderboard"
+            onClick={() => window.location.href = `/leaderboard/${groupId}`}
+          >
+            <FaTrophy size={22} />
+          </button>
+        </div>
       </div>
-      <div className="group-page-quotes-header">
-        <h3 className="group-page-title">Quotes</h3>
-        <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
-      </div>
-      <div className="group-page-divider" />
+      <div className="group-page-title-divider" />
       <div className="group-page-quotes-section" style={{ flexGrow: 1 }}>
         <ul className="group-page-quotes-list">
+          <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
           {quotes.length === 0 ? (
             <li className="group-page-empty">No quotes in this group.</li>
           ) : (
-            quotes.map(q => (
+            // Show newest quotes first
+            [...quotes].reverse().map(q => (
               <li key={q.$id} className="group-page-quote-item">
                 {editingQuoteId === q.$id ? (
                   // Edit form replaces quote content, not nested
@@ -194,10 +260,45 @@ function GroupPage({ groupId }) {
                       <span>{q.text}</span>
                       <span className="group-page-quote-author">— {q.author}</span>
                     </div>
-                    <button
-                      className="group-page-btn"
-                      onClick={() => handleEditClick(q)}
-                    >Edit</button>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                      height: '32px'
+                    }}>
+                      <button
+                        className="group-page-btn"
+                        onClick={() => handleEditClick(q)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '32px',
+                          height: '32px',
+                          padding: 0,
+                          minWidth: 0
+                        }}
+                        title="Edit"
+                      >
+                        <FaEdit size={18} />
+                      </button>
+                      <button
+                        className="group-page-btn"
+                        onClick={() => handleDeleteQuote(q.$id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '32px',
+                          height: '32px',
+                          padding: 0,
+                          minWidth: 0
+                        }}
+                        title="Delete"
+                      >
+                        <FaTrash size={18} />
+                      </button>
+                    </div>
                   </div>
                 )}
               </li>

@@ -1,12 +1,13 @@
-
 import React, { useEffect, useState } from 'react';
 import { databases } from '../appwrite';
 import CreateGroup from './CreateGroup';
 import '../styles/Sidebar.css';
+import { FaPlus } from 'react-icons/fa';
 
 function Sidebar({ user, selectedGroupId, setSelectedGroupId, handleLogout }) {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
 
   const fetchGroups = async () => {
     if (!user) return;
@@ -34,9 +35,10 @@ function Sidebar({ user, selectedGroupId, setSelectedGroupId, handleLogout }) {
 
   return (
     <aside className="sidebar">
-      <h2 className="sidebar-title">Groups</h2>
-      
-      <CreateGroup onGroupCreated={fetchGroups} />
+      <div className="sidebar-title">
+        <img src="/src/assets/quotient_icon.png" alt="Quotient Logo" className="sidebar-logo" />
+        Quotient
+      </div>
 
       {loading ? (
         <div className="sidebar-empty">Loading...</div>
@@ -54,6 +56,25 @@ function Sidebar({ user, selectedGroupId, setSelectedGroupId, handleLogout }) {
             </li>
           ))}
         </ul>
+      )}
+
+      <button
+        className="sidebar-group-item sidebar-new-group"
+        onClick={() => setShowCreateGroup(true)}
+        type="button"
+        style={{ justifyContent: 'center', padding: '0.6rem 0.8rem', fontSize: '1rem', lineHeight: '1' }}
+      >
+        <FaPlus></FaPlus>
+      </button>
+
+      {showCreateGroup && (
+        <CreateGroup
+          onGroupCreated={() => {
+            fetchGroups();
+            setShowCreateGroup(false);
+          }}
+          onClose={() => setShowCreateGroup(false)}
+        />
       )}
 
       <button className="sidebar-logout" onClick={handleLogout}>Logout</button>
