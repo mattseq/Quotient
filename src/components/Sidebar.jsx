@@ -36,7 +36,7 @@ function Sidebar({ user, selectedGroupId, setSelectedGroupId, handleLogout }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-title">
-        <img src="/src/assets/quotient_icon.png" alt="Quotient Logo" className="sidebar-logo" />
+        <img src="../src/assets/quotient_icon.png" alt="Quotient Logo" className="sidebar-logo" />
         Quotient
       </div>
 
