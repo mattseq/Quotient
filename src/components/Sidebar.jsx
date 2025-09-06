@@ -3,6 +3,7 @@ import { databases } from '../appwrite';
 import CreateGroup from './CreateGroup';
 import '../styles/Sidebar.css';
 import { FaPlus } from 'react-icons/fa';
+import Logo from '../assets/quotient_icon.png';
 
 function Sidebar({ user, selectedGroupId, setSelectedGroupId, handleLogout }) {
   const [groups, setGroups] = useState([]);
@@ -36,7 +37,7 @@ function Sidebar({ user, selectedGroupId, setSelectedGroupId, handleLogout }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-title">
-        <img src="../src/assets/quotient_icon.png" alt="Quotient Logo" className="sidebar-logo" />
+        <img src={Logo} alt="Quotient Logo" className="sidebar-logo" />
         Quotient
       </div>
 
