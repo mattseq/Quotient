@@ -1,6 +1,6 @@
 import '../styles/Login.css';
 import React, { useState } from 'react';
-import { account } from '../appwrite';
+import { account, databases } from '../appwrite';
 
 function Login({ onLogin }) {
     const [email, setEmail] = useState('');
@@ -18,6 +18,12 @@ function Login({ onLogin }) {
             // Let Appwrite generate a unique user ID
             await account.create('unique()', email, password);
             alert('Account created! You can now log in.');
+
+            // add user to database
+            await databases.createDocument("main", "users", (await account.get()).$id, {
+                username: email.split('@')[0]
+            });
+
         } catch (err) {
             alert(err.message || 'Failed to create account.');
         }
