@@ -2,6 +2,7 @@
 import './App.css';
 import Login from './pages/Login';
 import GroupPage from './pages/GroupPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import Sidebar from './components/Sidebar';
 import QuizPage from './pages/QuizPage';
 import React, { useEffect, useState } from 'react';
@@ -79,6 +80,14 @@ function App() {
         }
       />
       <Route
+        path="/leaderboard/:groupId"
+        element={
+          <ProtectedRoute loggedIn={loggedIn}>
+            <LeaderboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/"
         element={
           <ProtectedRoute loggedIn={loggedIn}>
@@ -93,7 +102,7 @@ function App() {
                 {selectedGroupId ? (
                   <GroupPage groupId={selectedGroupId} />
                 ) : (
-                  <div>Select a group from the sidebar.</div>
+                  <div style={{ padding: '1rem' }}>Select a group from the sidebar.</div>
                 )}
               </main>
             </div>

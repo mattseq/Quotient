@@ -1,14 +1,27 @@
 import '../styles/Login.css';
 import React, { useState } from 'react';
-import { client } from '../appwrite';
+import { account } from '../appwrite';
 
 function Login({ onLogin }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         onLogin(email, password);
+    };
+
+    const handleCreateAccount = async () => {
+        setLoading(true);
+        try {
+            // Let Appwrite generate a unique user ID
+            await account.create('unique()', email, password);
+            alert('Account created! You can now log in.');
+        } catch (err) {
+            alert(err.message || 'Failed to create account.');
+        }
+        setLoading(false);
     };
 
     return (
@@ -29,7 +42,15 @@ function Login({ onLogin }) {
                     onChange={e => setPassword(e.target.value)}
                     required
                 />
-                <button type="submit" className='login-button'>Log In</button>
+                <button type="submit" className='login-button' disabled={loading}>Log In</button>
+                <button
+                    type="button"
+                    className='create-account-button'
+                    onClick={handleCreateAccount}
+                    disabled={loading}
+                >
+                    {loading ? 'Creating...' : 'Create Account'}
+                </button>
             </form>
         </div>
     );
