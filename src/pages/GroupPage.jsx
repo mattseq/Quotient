@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import CreateGroup from '../components/CreateGroup';
 import { databases, account, client } from '../appwrite';
 import { ID } from 'appwrite';
 import '../styles/GroupPage.css';
-import { FaEdit, FaTrash, FaTrophy, FaClipboardList, FaPlus } from 'react-icons/fa';
+import { FaTrash, FaTrophy, FaClipboardList, FaPlus, FaPen } from 'react-icons/fa';
 
 function AddQuote({ groupId, onQuoteAdded }) {
   const [showForm, setShowForm] = useState(false);
@@ -104,6 +105,7 @@ function GroupPage({ groupId }) {
   const [editAuthor, setEditAuthor] = useState('');
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
+  const [showEditGroup, setShowEditGroup] = useState(false);
 
   const fetchGroupAndQuotes = async () => {
     try {
@@ -206,7 +208,7 @@ function GroupPage({ groupId }) {
         <h2 className="group-page-title">{group.name}</h2>
         <div className="group-page-title-actions">
           <button
-            className="group-page-icon-btn quiz"
+            className="group-page-icon-btn"
             title="Quiz"
             onClick={() => window.location.href = `/quiz/${groupId}`}
           >
@@ -219,6 +221,27 @@ function GroupPage({ groupId }) {
           >
             <FaTrophy size={22} />
           </button>
+          <div className='group-page-title-group-actions'>
+            <button
+              className="group-page-icon-btn delete-group-btn"
+              title="Edit"
+              onClick={() => setShowEditGroup(true)}
+            >
+              <FaPen size={22} />
+            </button>
+            <button
+              className="group-page-icon-btn delete-group-btn"
+              title="Delete"
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete this group? This action cannot be undone.')) {
+                  databases.deleteDocument("main", "groups", groupId);
+                  window.location.href = '/';
+                }
+              }}
+            >
+              <FaTrash size={22} />
+            </button>
+          </div>
         </div>
       </div>
       <div className="group-page-title-divider" />
@@ -280,7 +303,7 @@ function GroupPage({ groupId }) {
                         }}
                         title="Edit"
                       >
-                        <FaEdit size={18} />
+                        <FaPen size={18} />
                       </button>
                       <button
                         className="group-page-btn"
@@ -306,6 +329,13 @@ function GroupPage({ groupId }) {
           )}
         </ul>
       </div>
+      {showEditGroup && (
+        <CreateGroup
+          group={group}
+          onClose={() => setShowEditGroup(false)}
+          onGroupUpdated={fetchGroupAndQuotes}
+        />
+      )}
     </div>
   );
 }

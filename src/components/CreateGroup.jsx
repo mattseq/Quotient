@@ -1,16 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { databases, account } from '../appwrite';
 import '../styles/CreateGroup.css';
 import { Query } from 'appwrite';
 
-function CreateGroup({ onGroupCreated, onClose }) {
-  const [name, setName] = useState('');
+function CreateGroup({ onGroupCreated, onClose, group, onGroupUpdated }) {
+  const [name, setName] = useState(group ? group.name : '');
   const [userSearch, setUserSearch] = useState('');
   const [userResults, setUserResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searching, setSearching] = useState(false);
+
+  // Pre-fill selected users if editing
+  useEffect(() => {
+    if (group) {
+      // Fetch user details for all members
+      const fetchMembers = async () => {
+        try {
+          const memberIds = group.members.filter(Boolean); // Remove any falsy values
+          if (memberIds.length === 0) {
+            setSelectedUsers([]);
+            return;
+          }
+          const dbId = "main";
+          const usersId = "users";
+          const res = await databases.listDocuments(dbId, usersId, [
+            Query.equal('$id', memberIds)
+          ]);
+          setSelectedUsers(res.documents.map(u => ({ id: u.$id, name: u.name, email: u.email })));
+        } catch {
+          setSelectedUsers([]);
+        }
+      };
+      setName(group.name || '');
+      fetchMembers();
+    } else {
+      setName('');
+      setSelectedUsers([]);
+    }
+  }, [group]);
 
   // Search users using Appwrite database
   const handleUserSearch = async (query) => {
@@ -59,15 +88,26 @@ function CreateGroup({ onGroupCreated, onClose }) {
     try {
       const user = await account.get();
       let members = [user.$id, ...selectedUsers.map(u => u.id)];
-      const group = await databases.createDocument("main", "groups", 'unique()', {
-        name,
-        members,
-        quoteBank: [],
-        quizzes: []
-      });
-      setName('');
-      setSelectedUsers([]);
-      if (onGroupCreated) onGroupCreated(group);
+      if (group) {
+        // Edit mode
+        await databases.updateDocument("main", "groups", group.$id, {
+          name,
+          members
+        });
+        if (onGroupUpdated) onGroupUpdated();
+        if (onClose) onClose();
+      } else {
+        // Create mode
+        const newGroup = await databases.createDocument("main", "groups", 'unique()', {
+          name,
+          members,
+          quoteBank: [],
+          quizzes: []
+        });
+        setName('');
+        setSelectedUsers([]);
+        if (onGroupCreated) onGroupCreated(newGroup);
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -79,7 +119,7 @@ function CreateGroup({ onGroupCreated, onClose }) {
       if (e.target.classList.contains('create-group-modal') && onClose) onClose();
     }}>
       <div className="create-group-modal-content">
-        <h3 className="create-group-title">Create a New Group</h3>
+  <h3 className="create-group-title">{group ? 'Edit Group' : 'Create a New Group'}</h3>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -114,7 +154,7 @@ function CreateGroup({ onGroupCreated, onClose }) {
                 <span key={u.id} className="create-group-user-chip">
                   {u.name}
                   {u.email && (
-                    <span style={{ color: '#B0B0B0', fontSize: '0.95em', marginLeft: '0.5em' }}>
+                    <span>
                       {u.email}
                     </span>
                   )}
@@ -132,7 +172,7 @@ function CreateGroup({ onGroupCreated, onClose }) {
           )}
           <div className="create-group-modal-actions">
             <button type="submit" disabled={loading} className="create-group-btn">
-              {loading ? 'Creating...' : 'Create Group'}
+              {loading ? (group ? 'Saving...' : 'Creating...') : (group ? 'Save Changes' : 'Create Group')}
             </button>
             <button type="button" className="create-group-cancel" onClick={onClose}>Cancel</button>
           </div>
