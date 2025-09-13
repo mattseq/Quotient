@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { databases, account } from '../appwrite';
 import '../styles/QuizPage.css';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function QuizPage() {
   const { groupId } = useParams();
@@ -78,39 +79,53 @@ function QuizPage() {
     setSaving(false);
   };
 
-  if (loading) return <div className="quiz-page-container">Loading...</div>;
-  if (questions.length === 0) return <div className="quiz-page-empty">No quotes available for quiz.</div>;
+  if (loading) return <motion.div className="quiz-page-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>Loading...</motion.div>;
+  if (questions.length === 0) return <motion.div className="quiz-page-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>No quotes available for quiz.</motion.div>;
 
   return (
-    <div className="quiz-page-container">
-      <h2 className="quiz-page-title">Solo Quiz</h2>
-      {score === null ? (
-        <form className="quiz-page-form" onSubmit={handleSubmit}>
-          {questions.map((q, idx) => (
-            <div key={q.$id} className="quiz-page-question">
-              <div>{q.text}</div>
-              <input
-                type="text"
-                placeholder="Type the author..."
-                value={answers[idx]}
-                onChange={e => handleChange(idx, e.target.value)}
-                className="quiz-page-input"
-                required
-              />
+    <motion.div className="quiz-page-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <motion.h2 className="quiz-page-title" initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 80 }}>Solo Quiz</motion.h2>
+      <AnimatePresence mode="wait">
+        {score === null ? (
+          <motion.form className="quiz-page-form" onSubmit={handleSubmit} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            {questions.map((q, idx) => (
+              <motion.div
+                key={q.$id}
+                className="quiz-page-question"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ delay: idx * 0.05 }}
+                layout
+              >
+                <div className="quiz-page-question-text">{q.text}</div>
+                <input
+                  type="text"
+                  placeholder="Type the author..."
+                  value={answers[idx]}
+                  onChange={e => handleChange(idx, e.target.value)}
+                  className="quiz-page-input"
+                  required
+                />
+              </motion.div>
+            ))}
+            <motion.button type="submit" className="quiz-page-btn" disabled={saving} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+              {saving ? 'Saving...' : 'Submit Answers'}
+            </motion.button>
+          </motion.form>
+        ) : (
+          <motion.div key="score" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="quiz-page-score-container">
+            <div className="quiz-page-score">
+              Your Score: {score} / {questions.length}
             </div>
-          ))}
-          <button type="submit" className="quiz-page-btn" disabled={saving}>{saving ? 'Saving...' : 'Submit Answers'}</button>
-        </form>
-      ) : (
-        <>
-          <div className="quiz-page-score">
-            Your Score: {score} / {questions.length}
-          </div>
-          {error && <div style={{ color: 'red', marginTop: '1rem' }}>{error}</div>}
-          <button className="quiz-page-btn" style={{ marginTop: '2rem' }} onClick={() => navigate('/')}>Back to Menu</button>
-        </>
-      )}
-    </div>
+            {error && <div className="quiz-page-error">{error}</div>}
+            <motion.button className="quiz-page-btn" onClick={() => navigate('/')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+              Back to Menu
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
