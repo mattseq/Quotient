@@ -265,76 +265,91 @@ function GroupPage({ groupId }) {
                   exit={{ opacity: 0, y: -20 }}
                   layout
                 >
-                  {editingQuoteId === q.$id ? (
-                    // Edit form replaces quote content, not nested
-                    <>
-                      <textarea
-                        className="edit-quote-input"
-                        value={editText}
-                        onChange={e => setEditText(e.target.value)}
-                        rows={3}
-                      />
-                      <input
-                        className="edit-quote-input"
-                        type="text"
-                        value={editAuthor}
-                        onChange={e => setEditAuthor(e.target.value)}
-                      />
-                      <div>
-                        <button onClick={handleEditSave} disabled={editLoading} className="group-page-btn" style={{ marginRight: '1rem' }}>
-                          {editLoading ? 'Saving...' : 'Save'}
-                        </button>
-                        <button onClick={handleEditCancel} className="group-page-btn">Cancel</button>
-                      </div>
-                      {editError && <div className="add-quote-error">{editError}</div>}
-                    </>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <span>{q.text}</span>
-                        <span className="group-page-quote-author">— {q.author}</span>
-                      </div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.25rem',
-                        height: '32px'
-                      }}>
-                        <button
-                          className="group-page-btn"
-                          onClick={() => handleEditClick(q)}
-                          style={{
+                  <AnimatePresence mode="wait">
+                    {editingQuoteId === q.$id ? (
+                      <motion.div
+                        key="edit"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ width: '100%' }}
+                      >
+                        <textarea
+                          className="edit-quote-input"
+                          value={editText}
+                          onChange={e => setEditText(e.target.value)}
+                          rows={3}
+                        />
+                        <input
+                          className="edit-quote-input"
+                          type="text"
+                          value={editAuthor}
+                          onChange={e => setEditAuthor(e.target.value)}
+                        />
+                        <div>
+                          <button onClick={handleEditSave} disabled={editLoading} className="group-page-btn" style={{ marginRight: '1rem' }}>
+                            {editLoading ? 'Saving...' : 'Save'}
+                          </button>
+                          <button onClick={handleEditCancel} className="group-page-btn">Cancel</button>
+                        </div>
+                        {editError && <div className="add-quote-error">{editError}</div>}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="view"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ width: '100%' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div>
+                            <span>{q.text}</span>
+                            <span className="group-page-quote-author">— {q.author}</span>
+                          </div>
+                          <div style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '32px',
-                            height: '32px',
-                            padding: 0,
-                            minWidth: 0
-                          }}
-                          title="Edit"
-                        >
-                          <FaPen size={18} />
-                        </button>
-                        <button
-                          className="group-page-btn"
-                          onClick={() => handleDeleteQuote(q.$id)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '32px',
-                            height: '32px',
-                            padding: 0,
-                            minWidth: 0
-                          }}
-                          title="Delete"
-                        >
-                          <FaTrash size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                            gap: '0.25rem',
+                            height: '32px'
+                          }}>
+                            <button
+                              className="group-page-btn"
+                              onClick={() => handleEditClick(q)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '32px',
+                                height: '32px',
+                                padding: 0,
+                                minWidth: 0
+                              }}
+                              title="Edit"
+                            >
+                              <FaPen size={18} />
+                            </button>
+                            <button
+                              className="group-page-btn"
+                              onClick={() => handleDeleteQuote(q.$id)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '32px',
+                                height: '32px',
+                                padding: 0,
+                                minWidth: 0
+                              }}
+                              title="Delete"
+                            >
+                              <FaTrash size={18} />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.li>
               ))
             )}
