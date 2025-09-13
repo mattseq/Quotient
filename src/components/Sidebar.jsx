@@ -47,13 +47,9 @@ function Sidebar({ user, selectedGroupId, setSelectedGroupId, handleLogout }) {
             <motion.div className="sidebar-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               Loading...
             </motion.div>
-          ) : groups.length === 0 ? (
-            <motion.div className="sidebar-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              No groups found.
-            </motion.div>
           ) : (
             <motion.ul className="sidebar-group-list" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}>
-              {groups.map(group => (
+              {groups.length === 0 ? null : groups.map(group => (
                 <motion.li
                   key={group.$id}
                   className={`sidebar-group-item${selectedGroupId === group.$id ? ' selected' : ''}`}
