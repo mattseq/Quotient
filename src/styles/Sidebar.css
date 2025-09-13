@@ -54,10 +54,33 @@
   margin-bottom: 2rem;
 }
 
+.sidebar-scroll-area {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .sidebar-group-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  min-height: 0;
+  padding-right: 8px; /* Space between scrollbar and group items */
+}
+.sidebar-group-list::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-group-list::-webkit-scrollbar-thumb {
+  background: var(--color-bg);
+  border-radius: 4px;
+}
+.sidebar-group-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-light);
 }
 
 .sidebar-group-item {

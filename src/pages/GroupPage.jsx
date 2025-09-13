@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import CreateGroup from '../components/CreateGroup';
 import { databases, account, client } from '../appwrite';
 import { ID } from 'appwrite';
@@ -248,94 +249,114 @@ function GroupPage({ groupId }) {
       <div className="group-page-quotes-section" style={{ flexGrow: 1 }}>
         <ul className="group-page-quotes-list">
           <AddQuote groupId={groupId} onQuoteAdded={fetchGroupAndQuotes} />
-          {quotes.length === 0 ? (
-            <li className="group-page-empty">No quotes in this group.</li>
-          ) : (
-            // Show newest quotes first
-            [...quotes].reverse().map(q => (
-              <li key={q.$id} className="group-page-quote-item">
-                {editingQuoteId === q.$id ? (
-                  // Edit form replaces quote content, not nested
-                  <>
-                    <textarea
-                      className="edit-quote-input"
-                      value={editText}
-                      onChange={e => setEditText(e.target.value)}
-                      rows={3}
-                    />
-                    <input
-                      className="edit-quote-input"
-                      type="text"
-                      value={editAuthor}
-                      onChange={e => setEditAuthor(e.target.value)}
-                    />
-                    <div>
-                      <button onClick={handleEditSave} disabled={editLoading} className="group-page-btn" style={{ marginRight: '1rem' }}>
-                        {editLoading ? 'Saving...' : 'Save'}
-                      </button>
-                      <button onClick={handleEditCancel} className="group-page-btn">Cancel</button>
+          <AnimatePresence>
+            {quotes.length === 0 ? (
+              <motion.li className="group-page-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                No quotes in this group.
+              </motion.li>
+            ) : (
+              // Show newest quotes first
+              [...quotes].reverse().map(q => (
+                <motion.li
+                  key={q.$id}
+                  className="group-page-quote-item"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  layout
+                >
+                  {editingQuoteId === q.$id ? (
+                    // Edit form replaces quote content, not nested
+                    <>
+                      <textarea
+                        className="edit-quote-input"
+                        value={editText}
+                        onChange={e => setEditText(e.target.value)}
+                        rows={3}
+                      />
+                      <input
+                        className="edit-quote-input"
+                        type="text"
+                        value={editAuthor}
+                        onChange={e => setEditAuthor(e.target.value)}
+                      />
+                      <div>
+                        <button onClick={handleEditSave} disabled={editLoading} className="group-page-btn" style={{ marginRight: '1rem' }}>
+                          {editLoading ? 'Saving...' : 'Save'}
+                        </button>
+                        <button onClick={handleEditCancel} className="group-page-btn">Cancel</button>
+                      </div>
+                      {editError && <div className="add-quote-error">{editError}</div>}
+                    </>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <span>{q.text}</span>
+                        <span className="group-page-quote-author">— {q.author}</span>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        height: '32px'
+                      }}>
+                        <button
+                          className="group-page-btn"
+                          onClick={() => handleEditClick(q)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '32px',
+                            height: '32px',
+                            padding: 0,
+                            minWidth: 0
+                          }}
+                          title="Edit"
+                        >
+                          <FaPen size={18} />
+                        </button>
+                        <button
+                          className="group-page-btn"
+                          onClick={() => handleDeleteQuote(q.$id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '32px',
+                            height: '32px',
+                            padding: 0,
+                            minWidth: 0
+                          }}
+                          title="Delete"
+                        >
+                          <FaTrash size={18} />
+                        </button>
+                      </div>
                     </div>
-                    {editError && <div className="add-quote-error">{editError}</div>}
-                  </>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div>
-                      <span>{q.text}</span>
-                      <span className="group-page-quote-author">— {q.author}</span>
-                    </div>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      height: '32px'
-                    }}>
-                      <button
-                        className="group-page-btn"
-                        onClick={() => handleEditClick(q)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '32px',
-                          height: '32px',
-                          padding: 0,
-                          minWidth: 0
-                        }}
-                        title="Edit"
-                      >
-                        <FaPen size={18} />
-                      </button>
-                      <button
-                        className="group-page-btn"
-                        onClick={() => handleDeleteQuote(q.$id)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '32px',
-                          height: '32px',
-                          padding: 0,
-                          minWidth: 0
-                        }}
-                        title="Delete"
-                      >
-                        <FaTrash size={18} />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))
-          )}
+                  )}
+                </motion.li>
+              ))
+            )}
+          </AnimatePresence>
         </ul>
       </div>
-      {showEditGroup && (
-        <CreateGroup
-          group={group}
-          onClose={() => setShowEditGroup(false)}
-          onGroupUpdated={fetchGroupAndQuotes}
-        />
-      )}
+      <AnimatePresence>
+        {showEditGroup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1000 }}
+          >
+            <CreateGroup
+              group={group}
+              onClose={() => setShowEditGroup(false)}
+              onGroupUpdated={fetchGroupAndQuotes}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
