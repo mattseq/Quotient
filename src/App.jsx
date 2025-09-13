@@ -34,7 +34,6 @@ function App() {
       setLoading(false);
       navigate('/login');
     });
-    // eslint-disable-next-line
   }, []);
 
   const handleLogin = async (email, password) => {

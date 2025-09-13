@@ -2,8 +2,10 @@ import '../styles/Login.css';
 import React, { useState } from 'react';
 import { account, databases } from '../appwrite';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 function Login({ onLogin }) {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -19,13 +21,14 @@ function Login({ onLogin }) {
         try {
             // Let Appwrite generate a unique user ID
             await account.create('unique()', email, password);
-            alert('Account created! You can now log in.');
-
+            await account.createEmailPasswordSession(email, password);
+            const user = await account.get();
             // add user to database
-            await databases.createDocument("main", "users", (await account.get()).$id, {
-                username: email.split('@')[0]
+            await databases.createDocument("main", "users", user.$id, {
+                username: email.split('@')[0],
+                email: email
             });
-
+            navigate('/');
         } catch (err) {
             alert(err.message || 'Failed to create account.');
         }
